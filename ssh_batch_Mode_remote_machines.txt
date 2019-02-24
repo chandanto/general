@@ -1,0 +1,48 @@
+I tried on my VM + Azure (3 Virtual Machine ) to do ssh -client + create file1, file2, file3 folder on those three VM's parallel using BatchMode=True (/etc/ssh/ssh_config > host {configure BatchMode=True}). 
+
+My Three VM IP added in hostname.list
+[root@ansibletower ssh_conscept]# cat hostname.list 
+13.76.128.75
+13.76.135.200
+52.163.84.161
+
+Command i tried 
+[root@ansibletower ssh_conscept]# 
+for hosts in $(< hostname.list xargs); do for host in $hosts; do  ssh -i chandan_public_key.pem -n -o BatchMode=yes chandan@"$host" 'mkdir -p /home/chandan/file1; mkdir -p /home/chandan/file2; mkdir -p /home/chandan/file3; ls --full-time' 1> /tmp/prank_log 2>&1  & done; done
+
+
+Look at the below folder timestamp for all three file + on all three VM remains same
+
+VM-1
+[root@ansibletower ssh_conscept]# ssh -i chandan_public_key.pem chandan@13.76.128.75
+Last login: Wed Feb 20 13:14:33 2019 from 61.246.61.13
+[chandan@k8-machine-1 ~]$ ls --full-time
+total 0
+drwxrwxr-x 2 chandan chandan 6 2019-02-20 13:20:17.141435427 +0000 file1
+drwxrwxr-x 2 chandan chandan 6 2019-02-20 13:20:17.142435464 +0000 file2
+drwxrwxr-x 2 chandan chandan 6 2019-02-20 13:20:17.144435536 +0000 file3
+[chandan@k8-machine-1 ~]$ logout
+Connection to 13.76.128.75 closed.
+
+VM-2
+[root@ansibletower ssh_conscept]# ssh -i chandan_public_key.pem chandan@13.76.135.200
+Last login: Wed Feb 20 13:14:54 2019 from 61.246.61.13
+[chandan@k8-machine-2 ~]$ ls --full-time
+total 0
+drwxrwxr-x 2 chandan chandan 6 2019-02-20 13:20:17.327189293 +0000 file1
+drwxrwxr-x 2 chandan chandan 6 2019-02-20 13:20:17.328189295 +0000 file2
+drwxrwxr-x 2 chandan chandan 6 2019-02-20 13:20:17.329189297 +0000 file3
+[chandan@k8-machine-2 ~]$ logout
+Connection to 13.76.135.200 closed.
+
+VM -3 
+[root@ansibletower ssh_conscept]# ssh -i chandan_public_key.pem chandan@52.163.84.161
+Last login: Wed Feb 20 13:14:08 2019 from 61.246.61.13
+[chandan@k8-machine-3 ~]$ ls --full-time
+total 0
+drwxrwxr-x 2 chandan chandan 6 2019-02-20 13:20:17.152637581 +0000 file1
+drwxrwxr-x 2 chandan chandan 6 2019-02-20 13:20:17.153637583 +0000 file2
+drwxrwxr-x 2 chandan chandan 6 2019-02-20 13:20:17.154637585 +0000 file3
+
+
+Hope we can achieve this using option passing BatchMode=True
